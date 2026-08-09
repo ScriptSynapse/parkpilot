@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ParkPilot — Smart Student Parking Management System</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="hero-wrap">
+  <div class="hero-glow"></div>
+  <div class="container hero-grid">
+    <div>
+      <span class="badge badge-purple">✨ Built for campus security teams</span>
+      <h1 class="hero-title mt-2">
+        Scan a plate.<br />Reach the owner.<br />
+        <span class="accent">Clear the road.</span>
+      </h1>
+      <p class="mt-3 text-muted" style="font-size:17px; max-width:480px;">
+        ParkPilot replaces the campus-wide guessing game of "whose bike is this?" with one scan, one card, one call — no more chasing wardens or hostel notices.
+      </p>
+      <div class="flex gap-2 wrap mt-4">
+        <a href="register.html" class="btn btn-primary">Register Your Vehicle →</a>
+        <a href="staff-login.html" class="btn btn-ghost">🛡️ Staff Login</a>
+      </div>
+      <div class="flex gap-4 mt-5" style="max-width:380px;">
+        <div><div class="stat-value" id="stat-vehicles">—</div><div class="stat-label">Registered</div></div>
+        <div><div class="stat-value" id="stat-scans-today">—</div><div class="stat-label">Scans Today</div></div>
+        <div><div class="stat-value">1.4s</div><div class="stat-label">Avg. Match</div></div>
+      </div>
+    </div>
+
+    <div class="glass p-5" style="box-shadow:0 30px 80px -30px rgba(79,124,255,.35);">
+      <div class="flex items-center justify-between mb-2">
+        <span style="font-size:12px; font-weight:700; color:var(--teal); display:flex; align-items:center; gap:6px;">
+          <span class="pulse-dot"></span> LIVE SCAN
+        </span>
+        <span>🔍</span>
+      </div>
+      <div class="scan-box">
+        <div class="scan-line"></div>
+        <div id="hero-plate"></div>
+      </div>
+      <div class="flex items-center gap-3 p-4" style="background:rgba(255,255,255,.03); border-radius:12px;">
+        <div class="avatar" style="width:40px;height:40px;font-size:13px;">AM</div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:700;">Arjun Mehta · CS21B045</div>
+          <div class="text-faint" style="font-size:12px;">Honda Shine · Computer Science</div>
+        </div>
+        <span>📞</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container section">
+  <h2 style="font-size:24px;">Everything security needs, nothing they don't</h2>
+  <p class="text-muted mt-1 mb-4">Four tools that turn a parking complaint into a two-minute fix.</p>
+  <div class="grid grid-4">
+    <div class="glass feature-card">
+      <div class="feature-icon">🔍</div>
+      <div style="font-weight:700; margin-bottom:6px;">Instant Plate Recognition</div>
+      <div class="text-muted" style="font-size:14px;">Scan any number plate and pull up the owner's details in under two seconds.</div>
+    </div>
+    <div class="glass feature-card">
+      <div class="feature-icon">📞</div>
+      <div style="font-weight:700; margin-bottom:6px;">One-Tap Contact</div>
+      <div class="text-muted" style="font-size:14px;">Call or message the vehicle owner directly from the scan result card.</div>
+    </div>
+    <div class="glass feature-card">
+      <div class="feature-icon">⚠️</div>
+      <div style="font-weight:700; margin-bottom:6px;">Violation Logging</div>
+      <div class="text-muted" style="font-size:14px;">Report wrong parking, blocked roads, or damage with full audit history.</div>
+    </div>
+    <div class="glass feature-card">
+      <div class="feature-icon">📊</div>
+      <div style="font-weight:700; margin-bottom:6px;">Live Admin Insights</div>
+      <div class="text-muted" style="font-size:14px;">Track registrations, scans and violations on one premium dashboard.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section-alt">
+  <div class="container section">
+    <h2 style="font-size:24px; margin-bottom:28px;">How it works</h2>
+    <div class="grid grid-4">
+      <div><div class="step-num">01</div><div style="font-weight:700; margin-bottom:6px;">Student registers</div><div class="text-muted" style="font-size:14px;">Vehicle and contact details go into the central campus database.</div></div>
+      <div><div class="step-num">02</div><div style="font-weight:700; margin-bottom:6px;">Security scans a plate</div><div class="text-muted" style="font-size:14px;">Camera, manual entry, or upload — the plate is matched instantly.</div></div>
+      <div><div class="step-num">03</div><div style="font-weight:700; margin-bottom:6px;">Owner is reached</div><div class="text-muted" style="font-size:14px;">Security calls or messages the student straight from the result card.</div></div>
+      <div><div class="step-num">04</div><div style="font-weight:700; margin-bottom:6px;">Issue resolved</div><div class="text-muted" style="font-size:14px;">Vehicle moved, violation logged, campus keeps moving.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container section grid grid-2" style="align-items:center;">
+  <div>
+    <h2 style="font-size:24px; margin-bottom:16px;">Why campuses switch to ParkPilot</h2>
+    <div class="flex-col gap-2">
+      <div class="flex gap-2" style="align-items:flex-start;"><span>✅</span><span class="text-muted" style="font-size:14px;">No more block-by-block searches for a vehicle owner</span></div>
+      <div class="flex gap-2" style="align-items:flex-start;"><span>✅</span><span class="text-muted" style="font-size:14px;">Every scan and violation is logged with a timestamp</span></div>
+      <div class="flex gap-2" style="align-items:flex-start;"><span>✅</span><span class="text-muted" style="font-size:14px;">Students get a digital parking pass, no printouts</span></div>
+      <div class="flex gap-2" style="align-items:flex-start;"><span>✅</span><span class="text-muted" style="font-size:14px;">Admins see campus-wide parking health in one glance</span></div>
+    </div>
+  </div>
+  <div class="grid grid-2">
+    <div class="glass p-4 text-center"><div class="stat-value" style="background:var(--grad-primary); -webkit-background-clip:text; background-clip:text; color:transparent;">98%</div><div class="text-faint" style="font-size:12px; margin-top:4px;">Faster owner contact</div></div>
+    <div class="glass p-4 text-center"><div class="stat-value" style="background:var(--grad-primary); -webkit-background-clip:text; background-clip:text; color:transparent;">24/7</div><div class="text-faint" style="font-size:12px; margin-top:4px;">Security desk access</div></div>
+    <div class="glass p-4 text-center"><div class="stat-value" style="background:var(--grad-primary); -webkit-background-clip:text; background-clip:text; color:transparent;">0</div><div class="text-faint" style="font-size:12px; margin-top:4px;">Paper registration forms</div></div>
+    <div class="glass p-4 text-center"><div class="stat-value" style="background:var(--grad-primary); -webkit-background-clip:text; background-clip:text; color:transparent;">100%</div><div class="text-faint" style="font-size:12px; margin-top:4px;">Central database sync</div></div>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom:60px;">
+  <div class="glass p-8 text-center" style="background:var(--grad-soft);">
+    <h3 style="font-size:20px; margin-bottom:8px;">Ready to register your vehicle?</h3>
+    <p class="text-muted mb-3" style="font-size:14px;">Takes under two minutes. You'll get a digital parking pass instantly.</p>
+    <a href="register.html" class="btn btn-primary">Register Vehicle →</a>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="container footer-inner">
+    <span>© 2026 ParkPilot · Campus Parking Prototype</span>
+    <span>Built for the campus hackathon demo</span>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/landing.js"></script>
+</body>
+</html>

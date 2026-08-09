@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Login — ParkPilot</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="container-sm" style="padding-top:90px;">
+  <div class="glass p-6">
+    <div style="width:56px;height:56px;border-radius:16px;background:var(--grad-primary);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px;">📊</div>
+    <h2 style="font-size:20px;">Admin Login</h2>
+    <p class="text-muted mt-1 mb-4" style="font-size:14px;">View campus-wide registrations, scans and violation analytics.</p>
+    <form id="login-form" class="flex-col gap-3">
+      <label class="field"><span class="field-label">Admin Name <span class="req">*</span></span>
+        <input type="text" name="name" placeholder="e.g. Dean of Students" required /></label>
+      <label class="field"><span class="field-label">Password</span>
+        <input type="password" name="password" placeholder="Any password (demo)" /></label>
+      <button type="submit" class="btn btn-primary btn-block mt-1">Login</button>
+      <p class="text-faint text-center" style="font-size:12px;">Prototype demo — any credentials will work.</p>
+    </form>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  renderNav();
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = new FormData(e.target).get("name") || "Demo Admin";
+    Store.login("admin", name);
+    toast(`Welcome, ${name}`);
+    setTimeout(() => (window.location.href = "admin.html"), 250);
+  });
+});
+</script>
+</body>
+</html>

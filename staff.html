@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Security Desk — ParkPilot</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="container" style="padding-top:32px; padding-bottom:60px;">
+  <div class="flex items-center justify-between wrap mb-3">
+    <div>
+      <h1 style="font-size:20px; display:flex; align-items:center; gap:8px;">🛡️ Welcome, <span id="staff-name"></span></h1>
+      <p class="text-muted" style="font-size:14px;">Security &amp; Scanning Desk</p>
+    </div>
+    <span class="btn btn-ghost btn-sm">📍 Campus: Main Block</span>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="scan">🔍 Scan Number Plate</button>
+    <button class="tab-btn" data-tab="recent">🕒 Recent Scans</button>
+    <button class="tab-btn" data-tab="violations">⚠️ Parking Violations <span id="violation-count" class="badge badge-amber hidden" style="margin-left:4px;"></span></button>
+    <button class="tab-btn" data-tab="notifications">🔔 Notifications</button>
+  </div>
+
+  <!-- ===== Scan tab ===== -->
+  <div class="tab-panel" id="panel-scan">
+    <div class="grid split-2-3">
+      <div class="flex-col gap-3">
+        <div class="glass p-5">
+          <div style="font-weight:700; margin-bottom:14px;">📷 Camera / Upload</div>
+          <div class="scan-box" id="camera-box" style="height:140px;">
+            <span class="text-faint" style="font-size:12px;" id="camera-placeholder">Live feed placeholder</span>
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-ghost btn-sm" style="flex:1;" id="webcam-btn">📷 Use Webcam</button>
+            <label class="btn btn-ghost btn-sm" style="flex:1; text-align:center;">
+              ⬆ Upload Image
+              <input type="file" accept="image/*" id="upload-input" class="hidden" />
+            </label>
+          </div>
+        </div>
+        <div class="glass p-5">
+          <div style="font-weight:700; margin-bottom:14px;">🔍 Manual Number Entry</div>
+          <form id="manual-form" class="flex gap-2">
+            <input type="text" id="manual-plate" class="mono" placeholder="e.g. MH12AB1234" style="flex:1; background:rgba(255,255,255,.03); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:11px 14px; font-size:14px; text-transform:uppercase;" />
+            <button type="submit" class="btn btn-primary">Search</button>
+          </form>
+          <div class="flex gap-1 wrap mt-2" id="quick-plates"></div>
+        </div>
+      </div>
+
+      <div id="result-area">
+        <div class="glass empty-state">
+          <div class="icon">🔍</div>
+          <div style="font-weight:600;">No scan yet</div>
+          <div class="text-faint mt-1" style="font-size:14px;">Use the webcam, upload an image, or type a plate number to search the database.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Recent scans tab ===== -->
+  <div class="tab-panel hidden" id="panel-recent">
+    <div class="glass" style="overflow:hidden;">
+      <div class="p-5" style="font-weight:700; border-bottom:1px solid var(--border);">Recent Scans</div>
+      <div id="scans-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== Violations tab ===== -->
+  <div class="tab-panel hidden" id="panel-violations">
+    <div class="flex justify-between mb-2">
+      <span></span>
+      <button class="btn btn-primary btn-sm" id="report-violation-btn">＋ Report Violation</button>
+    </div>
+    <div class="glass" style="overflow:hidden;">
+      <div id="violations-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== Notifications tab ===== -->
+  <div class="tab-panel hidden" id="panel-notifications">
+    <div class="glass" style="overflow:hidden;">
+      <div class="p-5" style="font-weight:700; border-bottom:1px solid var(--border);">Notifications</div>
+      <div id="notifications-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Violation modal ===== -->
+<div class="modal-overlay hidden" id="violation-modal">
+  <div class="glass modal-box p-6">
+    <div class="flex justify-between items-center mb-3">
+      <div style="font-weight:700; display:flex; align-items:center; gap:8px;">⚠️ Report Parking Violation</div>
+      <button id="close-modal" class="btn-ghost btn-sm" style="background:none;border:none;">✕</button>
+    </div>
+    <form id="violation-form" class="flex-col gap-3">
+      <label class="field"><span class="field-label">Vehicle Number <span class="req">*</span></span>
+        <input type="text" name="vehicleNumber" id="modal-plate" class="mono" required /></label>
+      <label class="field"><span class="field-label">Reason <span class="req">*</span></span>
+        <select name="reason" id="modal-reason" required></select></label>
+      <label class="field"><span class="field-label">Location <span class="req">*</span></span>
+        <input type="text" name="location" placeholder="e.g. Block A Entrance" required /></label>
+      <button type="submit" class="btn btn-primary btn-block">Submit Report</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/staff.js"></script>
+</body>
+</html>
