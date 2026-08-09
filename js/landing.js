@@ -1,4 +1,4 @@
-/* ParkPilot — landing.js */
+/* js/landing.js */
 document.addEventListener("DOMContentLoaded", () => {
   renderNav();
 

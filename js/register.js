@@ -1,4 +1,4 @@
-/* ParkPilot — register.js */
+/* js/register.js */
 document.addEventListener("DOMContentLoaded", () => {
   renderNav();
 
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
     document.getElementById("success-details").innerHTML = details
       .map(([l, v]) => `
-        <div class="glass p-4" style="background:rgba(255,255,255,.03);">
+        <div class="glass p-4" style="background:var(--tint);">
           <div class="text-faint" style="font-size:11px;">${l}</div>
           <div style="font-size:14px; font-weight:600;">${escapeHtml(v || "—")}</div>
         </div>`)
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360">
       <rect width="600" height="360" rx="24" fill="#0d1220"/>
       <rect x="0" y="0" width="600" height="70" rx="24" fill="url(#g)"/>
-      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs>
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1d4ed8"/><stop offset="1" stop-color="#0f172a"/></linearGradient></defs>
       <text x="30" y="45" font-family="monospace" font-size="22" fill="#0a0d18" font-weight="bold">CAMPUS PARKING PASS</text>
       <text x="30" y="115" font-family="sans-serif" font-size="24" fill="#eef0f7" font-weight="bold">${escapeHtml(rec.studentName)}</text>
       <text x="30" y="145" font-family="sans-serif" font-size="15" fill="#94a0b8">${escapeHtml(rec.studentId)} · ${escapeHtml(rec.department)}</text>

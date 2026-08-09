@@ -1,4 +1,4 @@
-/* ParkPilot — staff.js */
+/* js/staff.js */
 document.addEventListener("DOMContentLoaded", () => {
   requireRole("staff", "staff-login.html");
   renderNav();
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function infoTile(label, value) {
-    return `<div class="p-4" style="background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:12px;">
+    return `<div class="p-4" style="background:var(--tint); border:1px solid var(--border); border-radius:12px;">
       <div class="text-faint" style="font-size:11px;">${label}</div>
       <div style="font-size:14px; font-weight:600;">${escapeHtml(value || "—")}</div>
     </div>`;

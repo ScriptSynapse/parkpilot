@@ -1,4 +1,4 @@
-/* ParkPilot — admin.js */
+/* js/admin.js */
 document.addEventListener("DOMContentLoaded", () => {
   requireRole("admin", "admin-login.html");
   renderNav();
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("stat-violations").textContent = violations.filter((v) => v.date === today).length;
   document.getElementById("stat-contacted").textContent = scans.filter((s) => s.result === "found").length;
 
-  const chartColors = { blue: "#4f7cff", purple: "#a855f7", teal: "#2dd4bf", amber: "#fbbf24", grid: "rgba(255,255,255,.08)", text: "#94a0b8" };
+  const chartColors = { blue: "#1d4ed8", purple: "#0f172a", teal: "#0d9488", amber: "#d97706", grid: "rgba(15,23,42,.08)", text: "#475569" };
   Chart.defaults.color = chartColors.text;
   Chart.defaults.font.size = 12;
 
