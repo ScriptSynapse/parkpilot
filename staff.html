@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Security Desk — ParkPilot</title>
+<title>Guard Portal — ParkPilot</title>
 <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -14,24 +14,30 @@
   <div class="flex items-center justify-between wrap mb-3">
     <div>
       <h1 style="font-size:20px; display:flex; align-items:center; gap:8px;">🛡️ Welcome, <span id="staff-name"></span></h1>
-      <p class="text-muted" style="font-size:14px;">Security &amp; Scanning Desk</p>
+      <p class="text-muted" style="font-size:14px;">Guard Portal — Vehicle &amp; Visitor Verification Desk</p>
     </div>
-    <span class="btn btn-ghost btn-sm">📍 Campus: Main Block</span>
+    <span class="btn btn-ghost btn-sm">📍 Campus: Main Gate</span>
   </div>
 
   <div class="tabs" id="tabs">
-    <button class="tab-btn active" data-tab="scan">🔍 Scan Number Plate</button>
+    <button class="tab-btn active" data-tab="scan">🔍 Scan Vehicle</button>
+    <button class="tab-btn" data-tab="verify">✅ Verify Vehicle</button>
+    <button class="tab-btn" data-tab="visitorpass">🪪 Scan Visitor Pass</button>
+    <button class="tab-btn" data-tab="visitorexit">🚪 Visitor Exit</button>
     <button class="tab-btn" data-tab="recent">🕒 Recent Scans</button>
-    <button class="tab-btn" data-tab="violations">⚠️ Parking Violations <span id="violation-count" class="badge badge-amber hidden" style="margin-left:4px;"></span></button>
-    <button class="tab-btn" data-tab="notifications">🔔 Notifications</button>
+    <button class="tab-btn" data-tab="incidents">🚨 Incidents <span id="incident-count" class="badge badge-red hidden" style="margin-left:4px;"></span></button>
+    <button class="tab-btn" data-tab="notifications">🔔 Notifications <span id="notif-count" class="badge badge-blue hidden" style="margin-left:4px;"></span></button>
   </div>
 
-  <!-- ===== Scan tab ===== -->
+  <!-- ===== Scan / Manual Lookup tab ===== -->
   <div class="tab-panel" id="panel-scan">
     <div class="grid split-2-3">
       <div class="flex-col gap-3">
         <div class="glass p-5">
-          <div style="font-weight:700; margin-bottom:14px;">📷 Camera / Upload</div>
+          <div class="flex items-center justify-between mb-3">
+            <div style="font-weight:700;">📷 Camera / Upload</div>
+            <span id="scan-demo-label"></span>
+          </div>
           <div class="scan-box" id="camera-box" style="height:140px;">
             <span class="text-faint" style="font-size:12px;" id="camera-placeholder">Live feed placeholder</span>
           </div>
@@ -42,9 +48,10 @@
               <input type="file" accept="image/*" id="upload-input" class="hidden" />
             </label>
           </div>
+          <div class="sim-note">⚙ Simulated recognition — always cross-check with Manual Entry.</div>
         </div>
         <div class="glass p-5">
-          <div style="font-weight:700; margin-bottom:14px;">🔍 Manual Number Entry</div>
+          <div style="font-weight:700; margin-bottom:14px;">🔍 Manual Vehicle Lookup</div>
           <form id="manual-form" class="flex gap-2">
             <input type="text" id="manual-plate" class="mono" placeholder="e.g. MH12AB1234" style="flex:1; background:var(--tint); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:11px 14px; font-size:14px; text-transform:uppercase;" />
             <button type="submit" class="btn btn-primary">Search</button>
@@ -57,9 +64,84 @@
         <div class="glass empty-state">
           <div class="icon">🔍</div>
           <div style="font-weight:600;">No scan yet</div>
-          <div class="text-faint mt-1" style="font-size:14px;">Use the webcam, upload an image, or type a plate number to search the database.</div>
+          <div class="text-faint mt-1" style="font-size:14px;">Use the webcam, upload an image, or type a plate number to search the central registry.</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== Verify Vehicle tab (Part 2) ===== -->
+  <div class="tab-panel hidden" id="panel-verify">
+    <div class="grid split-2-3">
+      <div class="glass p-5">
+        <div style="font-weight:700; margin-bottom:14px;">Look up a Registration</div>
+        <form id="verify-lookup-form" class="flex-col gap-3">
+          <label class="field"><span class="field-label">Registration ID or Vehicle Number</span>
+            <input type="text" name="query" class="mono" placeholder="e.g. PP-2026-000123 or MH12AB1234" /></label>
+          <button type="submit" class="btn btn-primary">Look Up</button>
+        </form>
+      </div>
+      <div id="verify-area">
+        <div class="glass empty-state">
+          <div class="icon">✅</div>
+          <div style="font-weight:600;">No vehicle selected</div>
+          <div class="text-faint mt-1" style="font-size:14px;">Look up a Registration ID or vehicle number to begin physical verification.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Scan Visitor Pass tab (Parts 7–8) ===== -->
+  <div class="tab-panel hidden" id="panel-visitorpass">
+    <div class="grid split-2-3">
+      <div class="flex-col gap-3">
+        <div class="glass p-5">
+          <div style="font-weight:700; margin-bottom:14px;">📷 Simulated QR Scanner</div>
+          <div class="scan-box" id="visitor-camera-box" style="height:120px;">
+            <span class="text-faint" style="font-size:12px;">Point camera at visitor's pass</span>
+          </div>
+          <button class="btn btn-ghost btn-sm w-full mt-3" id="visitor-scan-btn">📷 Simulate Scan</button>
+        </div>
+        <div class="glass p-5">
+          <div style="font-weight:700; margin-bottom:14px;">Enter Visitor ID / Token</div>
+          <form id="visitor-lookup-form" class="flex gap-2">
+            <input type="text" id="visitor-query" class="mono" placeholder="e.g. VIS-2026-00182" style="flex:1; background:var(--tint); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:11px 14px; font-size:14px; text-transform:uppercase;" />
+            <button type="submit" class="btn btn-primary">Check</button>
+          </form>
+        </div>
+      </div>
+      <div id="visitor-pass-area">
+        <div class="glass empty-state">
+          <div class="icon">🪪</div>
+          <div style="font-weight:600;">No pass scanned</div>
+          <div class="text-faint mt-1" style="font-size:14px;">Scan or enter a Visitor ID / token to validate their digital pass.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Visitor Exit tab (Part 9) ===== -->
+  <div class="tab-panel hidden" id="panel-visitorexit">
+    <div class="grid split-2-3">
+      <div class="glass p-5">
+        <div style="font-weight:700; margin-bottom:14px;">Find Visitor to Record Exit</div>
+        <form id="exit-lookup-form" class="flex-col gap-3">
+          <label class="field"><span class="field-label">Visitor ID or Vehicle Number</span>
+            <input type="text" name="query" class="mono" placeholder="e.g. VIS-2026-00182 or MH14XY5566" /></label>
+          <button type="submit" class="btn btn-primary">Find Visitor</button>
+        </form>
+      </div>
+      <div id="exit-area">
+        <div class="glass empty-state">
+          <div class="icon">🚪</div>
+          <div style="font-weight:600;">No visitor selected</div>
+          <div class="text-faint mt-1" style="font-size:14px;">Only visitors currently on campus can be exited.</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass mt-3" style="overflow:hidden;">
+      <div class="p-5" style="font-weight:700; border-bottom:1px solid var(--border);">Currently on Campus</div>
+      <div id="on-campus-list"></div>
     </div>
   </div>
 
@@ -71,14 +153,14 @@
     </div>
   </div>
 
-  <!-- ===== Violations tab ===== -->
-  <div class="tab-panel hidden" id="panel-violations">
+  <!-- ===== Incidents tab (Part 11 — replaces Parking Violations) ===== -->
+  <div class="tab-panel hidden" id="panel-incidents">
     <div class="flex justify-between mb-2">
-      <span></span>
-      <button class="btn btn-primary btn-sm" id="report-violation-btn">＋ Report Violation</button>
+      <span class="text-muted" style="font-size:13px;">Vehicle &amp; Security Incidents</span>
+      <button class="btn btn-primary btn-sm" id="report-incident-btn">＋ Report Incident</button>
     </div>
     <div class="glass" style="overflow:hidden;">
-      <div id="violations-list"></div>
+      <div id="incidents-list"></div>
     </div>
   </div>
 
@@ -91,27 +173,63 @@
   </div>
 </div>
 
-<!-- ===== Violation modal ===== -->
-<div class="modal-overlay hidden" id="violation-modal">
+<!-- ===== Incident modal ===== -->
+<div class="modal-overlay hidden" id="incident-modal">
   <div class="glass modal-box p-6">
     <div class="flex justify-between items-center mb-3">
-      <div style="font-weight:700; display:flex; align-items:center; gap:8px;">⚠️ Report Parking Violation</div>
-      <button id="close-modal" class="btn-ghost btn-sm" style="background:none;border:none;">✕</button>
+      <div style="font-weight:700; display:flex; align-items:center; gap:8px;">🚨 Report Vehicle / Security Incident</div>
+      <button id="close-incident-modal" class="btn-ghost btn-sm" style="background:none;border:none;">✕</button>
     </div>
-    <form id="violation-form" class="flex-col gap-3">
-      <label class="field"><span class="field-label">Vehicle Number <span class="req">*</span></span>
-        <input type="text" name="vehicleNumber" id="modal-plate" class="mono" required /></label>
-      <label class="field"><span class="field-label">Reason <span class="req">*</span></span>
-        <select name="reason" id="modal-reason" required></select></label>
+    <form id="incident-form" class="flex-col gap-3">
+      <label class="field"><span class="field-label">Vehicle Number</span>
+        <input type="text" name="vehicleNumber" id="incident-plate" class="mono" placeholder="Optional — leave blank if not vehicle-specific" /></label>
+      <label class="field"><span class="field-label">Issue Type <span class="req">*</span></span>
+        <select name="issueType" id="incident-type" required></select></label>
       <label class="field"><span class="field-label">Location <span class="req">*</span></span>
         <input type="text" name="location" placeholder="e.g. Block A Entrance" required /></label>
+      <label class="field"><span class="field-label">Remarks</span>
+        <input type="text" name="remarks" placeholder="Additional details" /></label>
       <button type="submit" class="btn btn-primary btn-block">Submit Report</button>
     </form>
   </div>
 </div>
 
+<!-- ===== Sticker issuance modal (Part 3) ===== -->
+<div class="modal-overlay hidden" id="sticker-modal">
+  <div class="glass modal-box p-6">
+    <div class="flex justify-between items-center mb-3">
+      <div style="font-weight:700;">🏷️ Issue Sticker</div>
+      <button id="close-sticker-modal" class="btn-ghost btn-sm" style="background:none;border:none;">✕</button>
+    </div>
+    <p class="text-muted mb-3" style="font-size:13.5px;">Vehicle passed verification. Issue a physical sticker to activate the registration.</p>
+    <div id="sticker-modal-vehicle" class="mb-3"></div>
+    <button class="btn btn-primary btn-block" id="issue-sticker-btn">🏷️ Issue Sticker ID</button>
+  </div>
+</div>
+
+<!-- ===== Unregistered vehicle action modal (Part 12) ===== -->
+<div class="modal-overlay hidden" id="unreg-modal">
+  <div class="glass modal-box p-6">
+    <div class="flex justify-between items-center mb-3">
+      <div style="font-weight:700;">❓ Unregistered Vehicle</div>
+      <button id="close-unreg-modal" class="btn-ghost btn-sm" style="background:none;border:none;">✕</button>
+    </div>
+    <form id="unreg-form" class="flex-col gap-3">
+      <div class="mono" id="unreg-plate" style="font-size:16px; font-weight:700;"></div>
+      <label class="field"><span class="field-label">Location <span class="req">*</span></span>
+        <input type="text" name="location" placeholder="e.g. Main Gate" required /></label>
+      <label class="field"><span class="field-label">Action Taken <span class="req">*</span></span>
+        <select name="action" id="unreg-action" required></select></label>
+      <button type="submit" class="btn btn-primary btn-block">Record Action</button>
+    </form>
+  </div>
+</div>
+
 <script src="js/store.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/incidents.js"></script>
+<script src="js/notifications.js"></script>
 <script src="js/staff.js"></script>
 </body>
 </html>

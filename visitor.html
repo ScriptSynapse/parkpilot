@@ -1,0 +1,59 @@
+<!-- visitor.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Visitor Registration — ParkPilot</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="container visitor-shell" style="padding-top:32px; padding-bottom:60px;">
+
+  <!-- ===== Visitor form ===== -->
+  <div id="form-view">
+    <span class="badge badge-blue">🧑‍💼 Visitor Self-Service</span>
+    <h1 style="font-size:22px; margin-top:12px;">Register your visit</h1>
+    <p class="text-muted mt-1" style="font-size:14px;">Scan this from the Gate QR, or fill it in on your phone before you arrive. Takes under a minute.</p>
+
+    <form id="visitor-form" class="glass p-6 mt-4 flex-col gap-3">
+      <label class="field"><span class="field-label">Full Name <span class="req">*</span></span>
+        <input type="text" name="fullName" placeholder="e.g. Meera Kulkarni" required /></label>
+      <label class="field"><span class="field-label">Mobile Number <span class="req">*</span></span>
+        <input type="tel" name="mobile" placeholder="10-digit number" required pattern="[0-9]{10}" /></label>
+      <label class="field"><span class="field-label">Vehicle Registration Number</span>
+        <input type="text" name="vehicleNumber" class="mono" placeholder="Optional — leave blank if on foot" /></label>
+      <label class="field"><span class="field-label">Purpose of Visit <span class="req">*</span></span>
+        <input type="text" name="purpose" placeholder="e.g. Guest lecture, delivery, meeting" required /></label>
+      <label class="field"><span class="field-label">Person Being Visited <span class="req">*</span></span>
+        <input type="text" name="host" placeholder="e.g. Dr. Kavita Rao" required /></label>
+      <label class="field"><span class="field-label">Department <span class="req">*</span></span>
+        <select name="department" required><option value="">Select...</option></select></label>
+      <div id="form-error" class="alert-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-block mt-1">Register Visitor</button>
+    </form>
+  </div>
+
+  <!-- ===== Success / pass view ===== -->
+  <div id="success-view" class="hidden">
+    <div class="glass p-6 text-center mb-3">
+      <div style="width:56px;height:56px;border-radius:999px;background:var(--grad-soft);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px;">✅</div>
+      <h2 style="font-size:18px;" id="success-title"></h2>
+      <p class="text-muted mt-1" style="font-size:13px;">Show this pass to security at the gate for entry.</p>
+    </div>
+    <div id="pass-mount"></div>
+    <div class="flex gap-2 wrap justify-center mt-4">
+      <button class="btn btn-ghost" id="register-another">＋ Register Another Visit</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/visitor.js"></script>
+</body>
+</html>

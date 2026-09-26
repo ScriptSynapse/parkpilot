@@ -17,53 +17,157 @@
   <div class="flex items-center justify-between wrap mb-3">
     <div>
       <h1 style="font-size:20px; display:flex; align-items:center; gap:8px;">📊 Admin Dashboard</h1>
-      <p class="text-muted" style="font-size:14px;">Campus-wide parking overview</p>
+      <p class="text-muted" style="font-size:14px;">Centralized Administrative Dashboard</p>
     </div>
-    <button class="btn btn-ghost btn-sm" id="export-csv">⬇ Export CSV</button>
+    <button class="btn btn-ghost btn-sm" id="export-csv">⬇ Export Vehicles CSV</button>
   </div>
 
-  <div class="grid grid-4 stat-grid mb-3">
-    <div class="glass stat-card"><div class="stat-icon">🚗</div><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total Registered Vehicles</div></div>
-    <div class="glass stat-card"><div class="stat-icon">🔍</div><div class="stat-value" id="stat-scans">0</div><div class="stat-label">Today's Scans</div></div>
-    <div class="glass stat-card"><div class="stat-icon">⚠️</div><div class="stat-value" id="stat-violations">0</div><div class="stat-label">Violations Today</div></div>
-    <div class="glass stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="stat-contacted">0</div><div class="stat-label">Students Contacted</div></div>
+  <div class="subtabs" id="subtabs">
+    <button class="subtab-btn active" data-sub="overview">Overview</button>
+    <button class="subtab-btn" data-sub="vehicles">Vehicle Management</button>
+    <button class="subtab-btn" data-sub="visitors">Visitor Registry</button>
+    <button class="subtab-btn" data-sub="incidents">Incident Management</button>
+    <button class="subtab-btn" data-sub="audit">Audit Logs</button>
+    <button class="subtab-btn" data-sub="users">User &amp; Role Management</button>
   </div>
 
-  <div class="grid split-2-1 mb-3">
-    <div class="glass p-5"><div style="font-weight:700; margin-bottom:14px; font-size:14px;">Scans — Last 7 Days</div><canvas id="trendChart"></canvas></div>
-    <div class="glass p-5"><div style="font-weight:700; margin-bottom:14px; font-size:14px;">Vehicle Types</div><canvas id="typeChart"></canvas></div>
+  <!-- ===================== OVERVIEW ===================== -->
+  <div class="sub-panel" id="sub-overview">
+    <div class="grid grid-4 stat-grid mb-3">
+      <div class="glass stat-card"><div class="stat-icon">🚗</div><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total Registered Vehicles</div></div>
+      <div class="glass stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="stat-active">0</div><div class="stat-label">Active Vehicles</div></div>
+      <div class="glass stat-card"><div class="stat-icon">⏳</div><div class="stat-value" id="stat-pending">0</div><div class="stat-label">Pending Verification</div></div>
+      <div class="glass stat-card"><div class="stat-icon">🚫</div><div class="stat-value" id="stat-suspended">0</div><div class="stat-label">Suspended Vehicles</div></div>
+    </div>
+    <div class="grid grid-4 stat-grid mb-3">
+      <div class="glass stat-card"><div class="stat-icon">⛔</div><div class="stat-value" id="stat-revoked">0</div><div class="stat-label">Revoked Vehicles</div></div>
+      <div class="glass stat-card"><div class="stat-icon">🧑‍💼</div><div class="stat-value" id="stat-visitors-oncampus">0</div><div class="stat-label">Visitors Currently on Campus</div></div>
+      <div class="glass stat-card"><div class="stat-icon">🚨</div><div class="stat-value" id="stat-incidents-new">0</div><div class="stat-label">New Incidents</div></div>
+      <div class="glass stat-card"><div class="stat-icon">🗄️</div><div class="stat-value" id="stat-incidents-resolved">0</div><div class="stat-label">Resolved Incidents</div></div>
+    </div>
+
+    <div class="grid split-2-1 mb-3">
+      <div class="glass p-5"><div style="font-weight:700; margin-bottom:14px; font-size:14px;">Scans — Last 7 Days</div><canvas id="trendChart"></canvas></div>
+      <div class="glass p-5"><div style="font-weight:700; margin-bottom:14px; font-size:14px;">Vehicle Types</div><canvas id="typeChart"></canvas></div>
+    </div>
+    <div class="glass p-5 mt-3 mb-3"><div style="font-weight:700; margin-bottom:14px; font-size:14px;">Registrations by Department</div><canvas id="deptChart"></canvas></div>
+
+    <div class="grid grid-2 mt-3">
+      <div class="glass" style="overflow:hidden;">
+        <div class="p-5" style="font-weight:700; font-size:14px; border-bottom:1px solid var(--border);">Recent Vehicle Events</div>
+        <div id="recent-vehicle-events"></div>
+      </div>
+      <div class="glass" style="overflow:hidden;">
+        <div class="p-5" style="font-weight:700; font-size:14px; border-bottom:1px solid var(--border);">Recent Visitor Events</div>
+        <div id="recent-visitor-events"></div>
+      </div>
+    </div>
+    <div class="grid grid-2 mt-3">
+      <div class="glass" style="overflow:hidden;">
+        <div class="p-5" style="font-weight:700; font-size:14px; border-bottom:1px solid var(--border);">Recent Incidents</div>
+        <div id="recent-incidents"></div>
+      </div>
+      <div class="glass" style="overflow:hidden;">
+        <div class="p-5" style="font-weight:700; font-size:14px; border-bottom:1px solid var(--border);">Pending Verifications</div>
+        <div id="pending-verifications"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="glass p-5 mt-3 mb-3"><div style="font-weight:700; margin-bottom:14px; font-size:14px;">Registrations by Department</div><canvas id="deptChart"></canvas></div>
+  <!-- ===================== VEHICLE MANAGEMENT ===================== -->
+  <div class="sub-panel hidden" id="sub-vehicles">
+    <div class="glass p-5 mb-3">
+      <div class="filter-bar mb-2">
+        <input type="text" id="vehicle-search" placeholder="Search name, ID, plate, Registration ID, Sticker ID..." style="flex:1; min-width:220px;" />
+        <select id="vehicle-status-filter"><option value="">All Statuses</option></select>
+        <select id="vehicle-category-filter"><option value="">All Categories</option></select>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Name</th><th>Category</th><th>Reg. ID</th><th>Plate</th><th>Status</th><th>Sticker</th><th></th></tr></thead>
+          <tbody id="vehicle-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="vehicle-detail-mount"></div>
+  </div>
 
-  <div class="grid grid-2 mt-3">
+  <!-- ===================== VISITOR REGISTRY ===================== -->
+  <div class="sub-panel hidden" id="sub-visitors">
+    <div class="glass p-5 mb-3">
+      <div class="filter-bar mb-2">
+        <input type="text" id="visitor-search" placeholder="Search name, host, vehicle..." style="flex:1; min-width:200px;" />
+        <select id="visitor-status-filter"><option value="">All Statuses</option></select>
+        <select id="visitor-dept-filter"><option value="">All Departments</option></select>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Visitor ID</th><th>Name</th><th>Vehicle</th><th>Host</th><th>Department</th><th>Purpose</th><th>Entry</th><th>Exit</th><th>Status</th></tr></thead>
+          <tbody id="visitor-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== INCIDENT MANAGEMENT ===================== -->
+  <div class="sub-panel hidden" id="sub-incidents">
+    <div class="grid split-2-3">
+      <div class="glass" style="overflow:hidden;">
+        <div class="p-5" style="font-weight:700; border-bottom:1px solid var(--border);">All Incidents</div>
+        <div id="admin-incidents-list"></div>
+      </div>
+      <div id="incident-detail-mount">
+        <div class="glass empty-state">
+          <div class="icon">🚨</div>
+          <div style="font-weight:600;">No incident selected</div>
+          <div class="text-faint mt-1" style="font-size:14px;">Open an incident to assign, act, and resolve it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== AUDIT LOGS ===================== -->
+  <div class="sub-panel hidden" id="sub-audit">
+    <div class="glass p-5 mb-3">
+      <div class="filter-bar">
+        <input type="text" id="audit-search" placeholder="Search actor, record, action..." style="flex:1; min-width:220px;" />
+        <select id="audit-type-filter">
+          <option value="">All Record Types</option>
+          <option value="Vehicle">Vehicle</option>
+          <option value="Sticker">Sticker</option>
+          <option value="Visitor">Visitor</option>
+          <option value="Incident">Incident</option>
+          <option value="UpdateRequest">Update Request</option>
+        </select>
+      </div>
+    </div>
     <div class="glass" style="overflow:hidden;">
-      <div class="p-5" style="font-weight:700; font-size:14px; border-bottom:1px solid var(--border);">Recent Registrations</div>
-      <div id="recent-registrations"></div>
-    </div>
-    <div class="glass" style="overflow:hidden;">
-      <div class="p-5" style="font-weight:700; font-size:14px; border-bottom:1px solid var(--border);">Recent Violations</div>
-      <div id="recent-violations"></div>
+      <div id="audit-log-list"></div>
     </div>
   </div>
 
-  <div class="glass p-5 mt-3">
-    <div class="flex justify-between items-center wrap mb-3 gap-2">
-      <div style="font-weight:700; font-size:14px;">Search Vehicle Database</div>
-      <input type="text" id="search-input" placeholder="Search by name, ID, or plate..." style="width:280px; background:var(--tint); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:9px 14px; font-size:14px;" />
+  <!-- ===================== USER & ROLE MANAGEMENT ===================== -->
+  <div class="sub-panel hidden" id="sub-users">
+    <div class="glass p-6 mb-3">
+      <div style="font-weight:700; margin-bottom:6px;">Roles &amp; Permissions</div>
+      <p class="text-muted mb-3" style="font-size:13.5px;">This frontend prototype simulates role-based access control in JavaScript (see <span class="mono">js/store.js</span> / <span class="mono">js/auth.js</span>). A real deployment would move this table to the backend and manage actual user accounts here.</p>
+      <div id="roles-table"></div>
     </div>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead><tr><th>Student</th><th>ID</th><th>Department</th><th>Plate</th><th>Vehicle</th><th>Status</th></tr></thead>
-        <tbody id="vehicle-table-body"></tbody>
-      </table>
+    <div class="glass p-6">
+      <div style="font-weight:700; margin-bottom:6px;">Pending Update Requests</div>
+      <p class="text-muted mb-3" style="font-size:13.5px;">Vehicle change requests submitted by students/staff — open the vehicle in Vehicle Management to approve or reject.</p>
+      <div id="pending-requests-list"></div>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script src="js/store.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/incidents.js"></script>
+<script src="js/audit.js"></script>
+<script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>

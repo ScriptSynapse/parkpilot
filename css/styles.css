@@ -301,3 +301,68 @@ td { padding: 10px 14px 10px 0; border-top: 1px solid var(--border); }
 .action-btn.primary { background: var(--grad-primary); color: white; border-color: transparent; }
 .action-btn.plain { background: var(--panel); color: var(--text); }
 .action-btn.amber { color: var(--amber); background: var(--panel); }
+
+/* ==========================================================================
+   Extensions — Smart Vehicle, Visitor & Parking Management workflows
+   (registration lifecycle, visitor passes, verification, incidents, audit)
+   All new components below reuse the existing tokens (--blue, --teal,
+   --amber, --red, --panel, --tint, --border, --radius*) rather than
+   introducing a new palette.
+   ========================================================================== */
+
+/* ---------- Key/value tile grid (status pages, verification detail) ---------- */
+.kv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 560px) { .kv-grid { grid-template-columns: 1fr; } }
+.kv-tile { background: var(--tint); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+.kv-label { font-size: 11px; color: var(--text-faint); margin-bottom: 3px; }
+.kv-value { font-size: 14px; font-weight: 600; }
+
+/* ---------- Timeline (verification / incident history) ---------- */
+.timeline { display: flex; flex-direction: column; gap: 10px; }
+.timeline-item { font-size: 13px; padding-left: 14px; border-left: 2px solid var(--border-strong); }
+.timeline-item .text-faint { font-size: 11.5px; margin-top: 2px; }
+
+/* ---------- Digital pass (verification pass + visitor pass) ---------- */
+.pass-card { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow-card); }
+.pass-head { background: var(--grad-primary); color: #fff; padding: 12px 20px; display: flex; justify-content: space-between;
+  align-items: center; font-size: 12px; font-weight: 800; letter-spacing: .4px; }
+.pass-body { background: var(--panel); padding: 20px; }
+.pass-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
+.pass-row:first-of-type { border-top: none; }
+.pass-row span:first-child { color: var(--text-faint); }
+.pass-warning { margin-top: 14px; font-size: 12px; color: var(--amber); background: rgba(217,119,6,.1);
+  border: 1px solid rgba(217,119,6,.3); border-radius: 10px; padding: 10px 12px; }
+.qr-box { width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; background: #0d1220; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; padding: 4px; }
+.qr-box span { font-family: "SFMono-Regular", Consolas, monospace; font-size: 8px; line-height: 1.15; color: #6ee7b7;
+  word-break: break-all; text-align: center; }
+.visitor-shell { max-width: 520px; margin: 0 auto; }
+
+/* ---------- Verification checklist (guard portal) ---------- */
+.checklist { display: flex; flex-direction: column; gap: 10px; }
+.checklist-item { display: flex; align-items: center; gap: 10px; background: var(--tint); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px; font-size: 14px; cursor: pointer; }
+.checklist-item input { width: 17px; height: 17px; accent-color: var(--blue); }
+
+/* ---------- Role tag (audit log actor) ---------- */
+.role-tag { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-faint);
+  background: var(--tint-strong); border-radius: 999px; padding: 2px 7px; margin-left: 4px; }
+
+/* ---------- Notification unread dot ---------- */
+.notif-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--blue); flex-shrink: 0; align-self: flex-start; margin-top: 4px; }
+
+/* ---------- Sub-tabs (admin dashboard sections) ---------- */
+.subtabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+.subtab-btn { padding: 10px 4px; margin-right: 14px; font-size: 13.5px; font-weight: 600; color: var(--text-faint);
+  background: none; border: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+.subtab-btn.active { color: var(--blue-soft); border-bottom-color: var(--blue); }
+
+/* ---------- Simple filter bar ---------- */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filter-bar select, .filter-bar input[type="text"], .filter-bar input[type="date"] {
+  background: var(--tint); border: 1px solid var(--border); color: var(--text); border-radius: 10px;
+  padding: 8px 12px; font-size: 13px; outline: none;
+}
+
+/* ---------- Simulated-backend note (report Part 24.12) ---------- */
+.sim-note { font-size: 11px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; margin-top: 6px; }

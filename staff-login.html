@@ -13,8 +13,8 @@
 <div class="container-sm" style="padding-top:90px;">
   <div class="glass p-6">
     <div style="width:56px;height:56px;border-radius:16px;background:var(--grad-primary);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px;">🛡️</div>
-    <h2 style="font-size:20px;">Security Staff Login</h2>
-    <p class="text-muted mt-1 mb-4" style="font-size:14px;">Access the scanning desk to look up vehicles and report violations.</p>
+    <h2 style="font-size:20px;">Security Guard Login</h2>
+    <p class="text-muted mt-1 mb-4" style="font-size:14px;">Access the guard portal to verify vehicles, scan visitor passes, and report incidents.</p>
     <form id="login-form" class="flex-col gap-3">
       <label class="field"><span class="field-label">Staff Name <span class="req">*</span></span>
         <input type="text" name="name" placeholder="e.g. Security Iqbal" required /></label>
@@ -27,6 +27,7 @@
 </div>
 
 <script src="js/store.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const name = new FormData(e.target).get("name") || "Demo User";
-    Store.login("staff", name);
+    Auth.login("staff", name);
     toast(`Welcome, ${name}`);
     setTimeout(() => (window.location.href = "staff.html"), 250);
   });

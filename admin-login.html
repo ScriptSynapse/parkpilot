@@ -27,6 +27,7 @@
 </div>
 
 <script src="js/store.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const name = new FormData(e.target).get("name") || "Demo Admin";
-    Store.login("admin", name);
+    Auth.login("admin", name);
     toast(`Welcome, ${name}`);
     setTimeout(() => (window.location.href = "admin.html"), 250);
   });

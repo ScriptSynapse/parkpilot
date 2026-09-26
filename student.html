@@ -1,0 +1,108 @@
+<!-- student.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Vehicle Status — ParkPilot</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<div id="nav-root"></div>
+
+<div class="container-md" style="padding-top:40px; padding-bottom:60px;">
+
+  <!-- ===== Lookup / "University Login" ===== -->
+  <div id="lookup-view">
+    <span class="badge badge-blue">🎓 University Vehicle Status</span>
+    <h1 style="font-size:24px; margin-top:12px;">Check your registration status</h1>
+    <p class="text-muted mt-1">Enter your Registration ID or Vehicle Number along with your registered mobile number to view your status, pass and sticker.</p>
+
+    <form id="lookup-form" class="glass p-6 mt-4 flex-col gap-3">
+      <label class="field"><span class="field-label">Registration ID or Vehicle Number <span class="req">*</span></span>
+        <input type="text" name="query" class="mono" placeholder="e.g. PP-2026-000123 or MH12AB1234" required /></label>
+      <label class="field"><span class="field-label">Registered Mobile Number <span class="req">*</span></span>
+        <input type="tel" name="mobile" placeholder="10-digit number" required pattern="[0-9]{10}" /></label>
+      <div id="lookup-error" class="alert-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-block mt-1">View My Status</button>
+      <p class="text-faint text-center" style="font-size:12px;">Prototype demo — this simulates university login using your registration details. No separate password is required.</p>
+    </form>
+
+    <div class="glass p-5 mt-4 text-center">
+      <p class="text-muted" style="font-size:13px;">Haven't registered a vehicle yet?</p>
+      <a href="register.html" class="btn btn-ghost btn-sm mt-2">Register Your Vehicle →</a>
+    </div>
+  </div>
+
+  <!-- ===== Dashboard ===== -->
+  <div id="dashboard-view" class="hidden">
+    <div class="flex items-center justify-between wrap mb-3">
+      <div>
+        <h1 style="font-size:20px;">🎓 Welcome, <span id="student-name"></span></h1>
+        <p class="text-muted" style="font-size:14px;">Vehicle Registration &amp; Verification Status</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="switch-vehicle">Look up another vehicle</button>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="status">📋 Registration Status</button>
+      <button class="tab-btn" data-tab="pass">🪪 Verification Pass</button>
+      <button class="tab-btn" data-tab="requests">✏️ Update Requests</button>
+      <button class="tab-btn" data-tab="notifications">🔔 Notifications</button>
+    </div>
+
+    <!-- Status tab -->
+    <div class="tab-panel" id="panel-status">
+      <div class="glass p-6 mb-3">
+        <div style="font-weight:700; margin-bottom:16px;">Registration Status</div>
+        <div class="kv-grid" id="status-grid"></div>
+      </div>
+      <div class="glass p-6">
+        <div class="flex justify-between items-center mb-2">
+          <div style="font-weight:700;">Verification History</div>
+        </div>
+        <div class="timeline" id="verification-history"></div>
+      </div>
+    </div>
+
+    <!-- Pass tab -->
+    <div class="tab-panel hidden" id="panel-pass">
+      <div id="pass-mount" class="container-sm" style="padding:0;"></div>
+    </div>
+
+    <!-- Update requests tab -->
+    <div class="tab-panel hidden" id="panel-requests">
+      <div class="glass p-6 mb-3">
+        <div style="font-weight:700; margin-bottom:6px;">Request a Change</div>
+        <p class="text-muted mb-3" style="font-size:13px;">Changes never apply automatically — every request is reviewed by an administrator first.</p>
+        <form id="request-form" class="flex-col gap-3">
+          <label class="field"><span class="field-label">Request Type <span class="req">*</span></span>
+            <select name="type" id="request-type" required></select></label>
+          <label class="field"><span class="field-label">Details <span class="req">*</span></span>
+            <input type="text" name="details" placeholder="Describe what needs to change" required /></label>
+          <button type="submit" class="btn btn-primary">Submit Request</button>
+        </form>
+      </div>
+      <div class="glass" style="overflow:hidden;">
+        <div class="p-5" style="font-weight:700; border-bottom:1px solid var(--border);">My Requests</div>
+        <div id="requests-list"></div>
+      </div>
+    </div>
+
+    <!-- Notifications tab -->
+    <div class="tab-panel hidden" id="panel-notifications">
+      <div class="glass" style="overflow:hidden;">
+        <div class="p-5" style="font-weight:700; border-bottom:1px solid var(--border);">Notifications</div>
+        <div id="notifications-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/student.js"></script>
+</body>
+</html>
