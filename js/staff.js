@@ -99,9 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ${infoTile("Parking Status", escapeHtml(op.parkingStatus))}
           </div>
           <div class="sim-note mb-2">🔒 Personal contact details are restricted from the guard view.</div>
-          <div class="action-grid">
-            <button class="action-btn primary" id="goto-verify-btn">✅ Verify</button>
-            <button class="action-btn amber" id="report-incident-from-scan">🚨 Report Incident</button>
+          <div class="flex gap-2 wrap">
+            <button class="btn btn-primary" style="flex:1; min-width:140px;" id="goto-verify-btn">✅ Verify</button>
+            <button class="btn btn-ghost amber" style="flex:1; min-width:140px;" id="report-incident-from-scan">🚨 Report Incident</button>
           </div>
         </div>`;
       document.getElementById("goto-verify-btn").addEventListener("click", () => {

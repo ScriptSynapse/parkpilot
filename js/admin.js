@@ -358,10 +358,12 @@ document.addEventListener("DOMContentLoaded", () => {
       ["IT / System Administrator", "itadmin", ["manage_users", "manage_roles", "technical_config", "view_audit_logs"]],
     ];
     document.getElementById("roles-table").innerHTML = `
+      <div class="table-scroll">
       <table><thead><tr><th>Role</th><th>Key</th><th>Permissions</th></tr></thead>
       <tbody>${roles.map(([label, key, perms]) => `
         <tr><td style="font-weight:600;">${escapeHtml(label)}</td><td class="mono text-muted">${escapeHtml(key)}</td>
-        <td class="text-muted" style="font-size:12.5px;">${perms.map((p) => `<span class="badge badge-grey" style="margin:2px;">${escapeHtml(p)}</span>`).join("")}</td></tr>`).join("")}</tbody></table>`;
+        <td class="text-muted" style="font-size:12.5px;">${perms.map((p) => `<span class="badge badge-grey" style="margin:2px;">${escapeHtml(p)}</span>`).join("")}</td></tr>`).join("")}</tbody></table>
+      </div>`;
 
     const pending = Store.getUpdateRequests().filter((r) => r.status === Store.REQUEST_STATUS.PENDING);
     document.getElementById("pending-requests-list").innerHTML = pending.length === 0 ? emptyState("✏️", "No pending update requests") :
