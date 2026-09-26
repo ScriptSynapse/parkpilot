@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("success-view").classList.remove("hidden");
     document.getElementById("success-title").textContent = `You're registered, ${visitor.fullName.split(" ")[0]}!`;
     document.getElementById("pass-mount").innerHTML = visitorPassHtml(visitor, pass);
+    renderQrInto(`visitor-qr-${visitor.id}`, pass.token, 96);
 
     document.getElementById("register-another").onclick = () => {
       form.reset();
@@ -50,10 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const status = Store.computePassStatus(pass);
     return `
       <div class="pass-card">
-        <div class="pass-head"><span>🪪 DIGITAL VISITOR PASS</span><span>${escapeHtml(visitor.visitorId)}</span></div>
+        <div class="pass-head"><span>🪪 DIGITAL VISITOR PASS</span><span>${escapeHtml(visitor.id)}</span></div>
         <div class="pass-body">
           <div class="flex gap-3 items-center mb-3">
-            <div class="qr-box"><span>${escapeHtml(pass.token)}</span></div>
+            <div class="qr-box" id="visitor-qr-${escapeHtml(visitor.id)}"></div>
             <div>
               <div style="font-weight:800; font-size:16px;">${escapeHtml(visitor.fullName)}</div>
               <div class="text-faint" style="font-size:12px;">${escapeHtml(visitor.purpose)}</div>
@@ -64,8 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="pass-row"><span>Department</span><span>${escapeHtml(visitor.department)}</span></div>
           <div class="pass-row"><span>Valid From</span><span>${fmtDateTime(pass.validFrom)}</span></div>
           <div class="pass-row"><span>Valid Until</span><span>${fmtDateTime(pass.validUntil)}</span></div>
-          <div class="pass-row"><span>Status</span><span>${status}</span></div>
-          <div class="pass-warning">⚠ This pass is single-use and expires automatically. A screenshot taken after use or expiry will not be valid.</div>
+          <div class="pass-row"><span>Status</span><span>${statusBadge(status)}</span></div>
+          <div class="pass-warning">⚠ Show this QR to security at the gate. The <b>first scan checks you in</b>, the <b>second scan checks you out</b> — after that the pass is used up. It also expires automatically, so a screenshot won't work after your visit window ends.</div>
         </div>
       </div>`;
   }

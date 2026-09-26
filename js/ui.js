@@ -166,6 +166,21 @@ function kvGrid(rows) {
   return `<div class="kv-grid">${rows.map(([l, v]) => kvTile(l, v)).join("")}</div>`;
 }
 
+/* ---------- Real QR code rendering (uses the QRCode library — see
+   js/vendor script tag on pages that show a pass). Falls back to a plain
+   token box if the library didn't load (e.g. offline demo), so the pass is
+   still usable via manual entry. ---------- */
+function renderQrInto(elementId, text, size) {
+  const mount = document.getElementById(elementId);
+  if (!mount) return;
+  mount.innerHTML = "";
+  if (window.QRCode) {
+    new QRCode(mount, { text, width: size || 84, height: size || 84, correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    mount.innerHTML = `<span style="font-family:monospace; font-size:8px; word-break:break-all; text-align:center; color:#0f172a;">${escapeHtml(text)}</span>`;
+  }
+}
+
 /* ---------- Digital Verification Pass (report Part 1.3) ----------
    Shown right after registration and on the student's status page. This is
    explicitly a *temporary* pass, never permanent entry authorization —
@@ -177,7 +192,7 @@ function verificationPassCardHtml(vehicle) {
       <div class="pass-head"><span>🪪 TEMPORARY VERIFICATION PASS</span><span>${escapeHtml(vehicle.registrationId)}</span></div>
       <div class="pass-body">
         <div class="flex gap-3 items-center mb-3">
-          <div class="qr-box"><span>${escapeHtml(token)}</span></div>
+          <div class="qr-box" id="qr-${escapeHtml(vehicle.id)}" data-qr-token="${escapeHtml(token)}"></div>
           <div>
             <div style="font-weight:800; font-size:16px;">${escapeHtml(vehicle.studentName)}</div>
             <div class="text-faint" style="font-size:12px;">${escapeHtml(vehicle.category)} · ${escapeHtml(vehicle.department)}</div>
@@ -191,6 +206,11 @@ function verificationPassCardHtml(vehicle) {
         <div class="pass-warning">⚠ Temporary Verification Pass — <b>not permanent entry authorization</b>. Present this at the gate for physical vehicle verification and sticker issuance.</div>
       </div>
     </div>`;
+}
+/** Call right after inserting verificationPassCardHtml() into the DOM. */
+function mountVerificationPassQr(vehicle) {
+  const token = `PPTKN-${vehicle.id.replace(/[^a-zA-Z0-9]/g, "").slice(-8).toUpperCase()}`;
+  renderQrInto(`qr-${vehicle.id}`, token);
 }
 
 /* ---------- Confirmation dialog (report Part 23: "confirmation before

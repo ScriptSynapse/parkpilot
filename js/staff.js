@@ -269,10 +269,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  /* ===================== Scan Visitor Pass tab (Parts 7–8) ===================== */
+  /* ===================== Scan Visitor Pass tab (Parts 7–8, QR toggle) ===================== */
   document.getElementById("visitor-lookup-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    runVisitorPassCheck(document.getElementById("visitor-query").value);
+    performVisitorScan(document.getElementById("visitor-query").value);
   });
   document.getElementById("visitor-scan-btn").addEventListener("click", () => {
     const box = document.getElementById("visitor-camera-box");
@@ -283,58 +283,54 @@ document.addEventListener("DOMContentLoaded", () => {
       box.innerHTML = `<span class="text-faint" style="font-size:12px;">Point camera at visitor's pass</span>`;
       if (pick) {
         document.getElementById("visitor-query").value = pick.id;
-        runVisitorPassCheck(pick.id);
+        performVisitorScan(pick.id);
       } else {
         toast("No visitor passes to demo-scan right now", "red");
       }
     }, 1100);
   });
 
-  function runVisitorPassCheck(query) {
+  /** Scanning a visitor's QR is the action itself (as at a real gate):
+   *  the first valid scan checks them in, the second checks them out. */
+  function performVisitorScan(query) {
     const area = document.getElementById("visitor-pass-area");
-    const result = Store.findVisitorPass(query);
-    if (!result || !result.found) {
+    const result = Store.scanVisitorPass({ query, gate: "Main Gate", guardName: staffName });
+
+    if (!result.ok) {
+      toast(result.message, "red");
       area.innerHTML = `
         <div class="glass p-6 text-center">
           <div style="font-size:28px; margin-bottom:8px;">🚫</div>
-          <div style="font-weight:700;">INVALID / EXPIRED / ALREADY USED</div>
-          <p class="text-muted mt-2" style="font-size:14px;">Refer visitor to manual security procedure.</p>
+          <div style="font-weight:700;">${result.code === "EXPIRED" ? "EXPIRED" : result.code === "USED" ? "ALREADY USED" : "INVALID / EXPIRED / ALREADY USED"}</div>
+          ${result.visitor ? `<div class="text-faint mt-1" style="font-size:13px;">${escapeHtml(result.visitor.fullName)} · ${escapeHtml(result.visitor.id)}</div>` : ""}
+          <p class="text-muted mt-2" style="font-size:14px;">${escapeHtml(result.message)} Refer visitor to manual security procedure.</p>
         </div>`;
       return;
     }
-    const { visitor, pass, status } = result;
-    const isValid = status === Store.PASS_STATUS.VALID;
+
+    const { visitor, pass, action } = result;
+    const isEntry = action === "entry";
+    toast(isEntry ? "Visitor Entry Recorded" : "Visitor Exit Recorded");
     area.innerHTML = `
       <div class="glass p-5">
+        <div class="text-center mb-3" style="padding:10px; border-radius:12px; background:${isEntry ? "rgba(45,212,191,.1)" : "rgba(79,124,255,.1)"};">
+          <div style="font-size:26px;">${isEntry ? "✅" : "🔵"}</div>
+          <div style="font-weight:800; font-size:15px; color:${isEntry ? "var(--teal)" : "var(--blue-soft)"};">${isEntry ? "ENTRY RECORDED" : "EXIT RECORDED"}</div>
+        </div>
         <div class="flex justify-between items-start mb-3">
           <div><div style="font-weight:800;">${escapeHtml(visitor.fullName)}</div><div class="text-faint" style="font-size:12px;">${escapeHtml(visitor.id)}</div></div>
-          ${statusBadge(status)}
+          ${statusBadge(visitor.status)}
         </div>
         <div class="grid grid-2 mb-3">
           ${infoTile("Vehicle Number", visitor.vehicleNumber ? `<span class="mono">${escapeHtml(visitor.vehicleNumber)}</span>` : "On foot")}
           ${infoTile("Purpose", escapeHtml(visitor.purpose))}
           ${infoTile("Host", escapeHtml(visitor.host))}
           ${infoTile("Department", escapeHtml(visitor.department))}
-          ${infoTile("Expiry", fmtDateTime(pass.validUntil))}
-          ${infoTile("Entry Status", statusBadge(visitor.status))}
+          ${infoTile("Gate", "Main Gate")}
+          ${infoTile("Pass Status", statusBadge(Store.computePassStatus(pass)))}
         </div>
-        ${isValid
-          ? `<div class="alert-error" style="background:rgba(45,212,191,.1); border-color:rgba(45,212,191,.3); color:var(--teal);">✅ VALID VISITOR PASS</div>
-             <button class="btn btn-primary btn-block mt-3" id="confirm-entry-btn">✅ Confirm Entry</button>`
-          : `<div class="alert-error">🚫 ${escapeHtml(status)} — Refer visitor to manual security procedure.</div>`}
+        <p class="text-muted" style="font-size:13px;">${isEntry ? "Scan this same QR again when the visitor leaves to record their exit." : "This pass has now been fully used and cannot be scanned again."}</p>
       </div>`;
-    const entryBtn = document.getElementById("confirm-entry-btn");
-    if (entryBtn) {
-      entryBtn.addEventListener("click", () => {
-        try {
-          Store.confirmVisitorEntry({ visitorId: visitor.id, gate: "Main Gate", guardName: staffName });
-          toast("Visitor Entry Recorded");
-          runVisitorPassCheck(visitor.id);
-        } catch (err) {
-          toast(err.message, "red");
-        }
-      });
-    }
   }
 
   /* ===================== Visitor Exit tab (Part 9) ===================== */

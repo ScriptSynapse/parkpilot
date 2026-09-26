@@ -94,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>`)
       .join("");
     document.getElementById("pass-mount").innerHTML = verificationPassCardHtml(rec);
+    mountVerificationPassQr(rec);
 
     document.getElementById("download-pass").onclick = () => downloadPass(rec);
     document.getElementById("register-another").onclick = () => {

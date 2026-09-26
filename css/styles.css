@@ -354,9 +354,10 @@ td { padding: 10px 14px 10px 0; border-top: 1px solid var(--border); overflow-wr
 .pass-row span:last-child { overflow-wrap: anywhere; text-align: right; }
 .pass-warning { margin-top: 14px; font-size: 12px; color: var(--amber); background: rgba(217,119,6,.1);
   border: 1px solid rgba(217,119,6,.3); border-radius: 10px; padding: 10px 12px; }
-.qr-box { width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; background: #0d1220; border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; padding: 4px; }
-.qr-box span { font-family: "SFMono-Regular", Consolas, monospace; font-size: 8px; line-height: 1.15; color: #6ee7b7;
+.qr-box { width: 88px; height: 88px; flex-shrink: 0; border-radius: 10px; background: #ffffff; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; padding: 5px; overflow: hidden; }
+.qr-box img, .qr-box canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+.qr-box span { font-family: "SFMono-Regular", Consolas, monospace; font-size: 8px; line-height: 1.15; color: #0f172a;
   word-break: break-all; text-align: center; }
 .visitor-shell { max-width: 520px; margin: 0 auto; }
 

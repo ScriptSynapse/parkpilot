@@ -488,28 +488,56 @@ const Store = {
     return { found: true, visitor, pass, status: this.computePassStatus(pass) };
   },
 
-  /** Report Part 8: confirm entry, log it, flip status, and burn the pass
-   *  so it can't be replayed for a second entry. */
-  confirmVisitorEntry({ visitorId, gate, guardName }) {
-    const visitor = this.getVisitorById(visitorId);
-    if (!visitor) throw new Error("Visitor not found.");
-    const pass = this.getPassForVisitor(visitor.id);
-    const status = this.computePassStatus(pass);
-    if (status !== PASS_STATUS.VALID) throw new Error(`Pass is ${status} — cannot confirm entry.`);
-
+  /** Report Parts 7–8, extended: scanning a visitor's QR toggles their
+   *  campus status. The FIRST valid scan checks them in; the SECOND valid
+   *  scan (same pass) checks them out and finally consumes the pass so a
+   *  screenshot can't be replayed for a third "visit". */
+  scanVisitorPass({ query, gate, guardName }) {
+    const result = this.findVisitorPass(query);
+    if (!result || !result.found) {
+      return { ok: false, code: "INVALID", message: "INVALID / EXPIRED / ALREADY USED" };
+    }
+    const { visitor, pass, status } = result;
+    if (status === PASS_STATUS.EXPIRED) {
+      return { ok: false, code: "EXPIRED", message: "This pass has expired.", visitor, pass };
+    }
+    if (status === PASS_STATUS.USED) {
+      return { ok: false, code: "USED", message: "This pass has already completed a full visit (entry + exit) and cannot be scanned again.", visitor, pass };
+    }
+    // status === VALID
+    if (visitor.status === VISITOR_STATUS.EXPECTED) {
+      // First scan of this pass — check in.
+      visitor.status = VISITOR_STATUS.ON_CAMPUS;
+      this.saveVisitor(visitor);
+      const logs = this.getEntryExitLogs();
+      const log = { id: genId("eel"), type: "visitor", refId: visitor.id, vehicleNumber: visitor.vehicleNumber, entryTime: new Date().toISOString(), exitTime: null, gate, guard: guardName, recordedBy: guardName };
+      logs.push(log);
+      writeKey(KEYS.entryExitLogs, logs);
+      this.addAuditLog({ actor: guardName, actorRole: "staff", action: "Visitor Entry", recordType: "Visitor", recordId: visitor.id, previousStatus: VISITOR_STATUS.EXPECTED, newStatus: VISITOR_STATUS.ON_CAMPUS, description: `Entered at ${gate} (QR scan).` });
+      this.addNotification({ audience: "admin", targetId: null, text: `${visitor.fullName} (${visitor.id}) is now on campus.`, tone: "🟢" });
+      return { ok: true, action: "entry", visitor, pass: this.getPassForVisitor(visitor.id) };
+    }
+    if (visitor.status === VISITOR_STATUS.ON_CAMPUS) {
+      // Second scan of the same pass — check out and consume it.
+      const log = this.getOpenEntryLog(visitor.id);
+      const logs = this.getEntryExitLogs();
+      if (log) {
+        const idx = logs.findIndex((l) => l.id === log.id);
+        logs[idx] = { ...log, exitTime: new Date().toISOString(), exitGate: gate, recordedBy: guardName };
+        writeKey(KEYS.entryExitLogs, logs);
+      }
+      visitor.status = VISITOR_STATUS.EXITED;
+      this.saveVisitor(visitor);
+      pass.status = PASS_STATUS.USED;
+      this.savePass(pass);
+      this.addAuditLog({ actor: guardName, actorRole: "staff", action: "Visitor Exit", recordType: "Visitor", recordId: visitor.id, previousStatus: VISITOR_STATUS.ON_CAMPUS, newStatus: VISITOR_STATUS.EXITED, description: `Exited via ${gate} (QR scan).` });
+      this.addNotification({ audience: "admin", targetId: null, text: `${visitor.fullName} (${visitor.id}) has exited campus.`, tone: "🔵" });
+      return { ok: true, action: "exit", visitor, pass };
+    }
+    // visitor.status is EXITED but the pass hadn't been marked USED yet (e.g. exited via the manual tab) — close it out now.
     pass.status = PASS_STATUS.USED;
     this.savePass(pass);
-    visitor.status = VISITOR_STATUS.ON_CAMPUS;
-    this.saveVisitor(visitor);
-
-    const logs = this.getEntryExitLogs();
-    const log = { id: genId("eel"), type: "visitor", refId: visitor.id, vehicleNumber: visitor.vehicleNumber, entryTime: new Date().toISOString(), exitTime: null, gate, guard: guardName, recordedBy: guardName };
-    logs.push(log);
-    writeKey(KEYS.entryExitLogs, logs);
-
-    this.addAuditLog({ actor: guardName, actorRole: "staff", action: "Visitor Entry", recordType: "Visitor", recordId: visitor.id, previousStatus: VISITOR_STATUS.EXPECTED, newStatus: VISITOR_STATUS.ON_CAMPUS, description: `Entered at ${gate}.` });
-    this.addNotification({ audience: "admin", targetId: null, text: `${visitor.fullName} (${visitor.id}) is now on campus.`, tone: "🟢" });
-    return { visitor, log };
+    return { ok: false, code: "USED", message: "This visitor has already exited.", visitor, pass };
   },
 
   getEntryExitLogs() { return readKey(KEYS.entryExitLogs, seedEntryExitLogs); },
@@ -517,7 +545,9 @@ const Store = {
     return this.getEntryExitLogs().filter((l) => l.refId === visitorId && l.type === "visitor" && !l.exitTime).sort((a, b) => new Date(b.entryTime) - new Date(a.entryTime))[0] || null;
   },
 
-  /** Report Part 9: exit by Visitor ID or vehicle number. */
+  /** Report Part 9: manual exit fallback by Visitor ID or vehicle number,
+   *  for a visitor who can't present their QR (lost phone, etc). Also
+   *  consumes the pass so it can't be scanned again afterwards. */
   recordVisitorExit({ query, gate, guardName }) {
     const q = (query || "").trim().toUpperCase();
     let visitor = this.getVisitorById(q) || this.getVisitorRecords().find((v) => normalizePlate(v.vehicleNumber) === normalizePlate(q));
@@ -533,8 +563,10 @@ const Store = {
     }
     visitor.status = VISITOR_STATUS.EXITED;
     this.saveVisitor(visitor);
+    const pass = this.getPassForVisitor(visitor.id);
+    if (pass) { pass.status = PASS_STATUS.USED; this.savePass(pass); }
 
-    this.addAuditLog({ actor: guardName, actorRole: "staff", action: "Visitor Exit", recordType: "Visitor", recordId: visitor.id, previousStatus: VISITOR_STATUS.ON_CAMPUS, newStatus: VISITOR_STATUS.EXITED, description: `Exited via ${gate}.` });
+    this.addAuditLog({ actor: guardName, actorRole: "staff", action: "Visitor Exit", recordType: "Visitor", recordId: visitor.id, previousStatus: VISITOR_STATUS.ON_CAMPUS, newStatus: VISITOR_STATUS.EXITED, description: `Exited via ${gate} (manual).` });
     this.addNotification({ audience: "admin", targetId: null, text: `${visitor.fullName} (${visitor.id}) has exited campus.`, tone: "🔵" });
     return visitor;
   },

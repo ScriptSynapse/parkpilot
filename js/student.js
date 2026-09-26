@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderPass(vehicle) {
     document.getElementById("pass-mount").innerHTML = verificationPassCardHtml(vehicle);
+    mountVerificationPassQr(vehicle);
   }
 
   function renderRequests(vehicle) {
